@@ -1,0 +1,68 @@
+市面上太多kv的缓存，最常用的就属memcache了，但是memcache存在单点问题，不过小日本有复制版本，但是使用的人比较少，redis的出现让kv内存存储的想法成为现实。今天主要内容便是redis主从实现简单的集群，实际上redis的安装配置砸门ttlsa之前就有个文章，废话少说，进入正题吧
+
+Redis简介
+
+
+redis是一个key-value存储系统。和Memcached类似，它支持存储的value类型相对更多，包括string(字符串)、 list(链表)、set(集合)和zset(有序集合)。这些数据类型都支持push/pop、add/remove及取交集并集和差集及更丰富的操 作，而且这些操作都是原子性的。在此基础上，redis支持各种不同方式的排序。与memcached一样，为了保证效率，数据都是缓存在内存中。区别的 是redis会周期性的把更新的数据写入磁盘或者把修改操作写入追加的记录文件，并且在此基础上实现了master-slave(主从)同步。
+
+Redis 是一个高性能的key-value数据库。 redis的出现，很大程度补偿了memcached这类key/value存储的不足，在部 分场合可以对关系数据库起到很好的补充作用。它提供了Python，Ruby，Erlang，PHP客户端，使用很方便。
+
+
+ 
+
+1. 下载软件包
+
+# cd /usr/local/src/
+
+# wget http://redis.googlecode.com/files/redis-2.6.11.tar.gz
+
+2. Redis安装
+
+
+主从都需要安装
+
+# tar -xzvf redis-2.6.11.tar.gz
+
+# mv redis-2.6.11 /usr/local/
+
+# cd /usr/local/redis-2.6.11/
+
+# make
+
+
+备注：这边就不make install 了，直接使用make好的文件
+
+3. redis配置
+
+找到配置文件/usr/local/redis-2.6.11/redis.conf
+
+修改如下内容：
+
+daemonize no 改为 yes # 是否后台运行
+
+port 6379 改为 12002  # 端口
+
+dir ./ 改为 /data/redis_12002/ 或者/www/redis_12002/  # 数据目录
+
+
+其他配置请查看相应文档，文章结尾将会附上所有配置参数
+
+4. redis启动与关闭
+
+
+启动
+
+/usr/local/redis-2.6.11/src/redis-server /usr/local/redis-2.6.11/redis.conf
+
+停止
+
+/usr/local/redis-2.6.11/src/redis-cli -n 12002 shutdown
+
+
+ 
+
+5. redis命令测试
+
+先登录shell客户端
+
+/usr/local/redis-2.6.11/src/redis-cli -p 12002
