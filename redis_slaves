@@ -1,0 +1,123 @@
+6. Redis主从配置
+
+
+6.1 只需要修改slave的配置
+
+
+找到配置文件/usr/local/redis-2.6.11/redis.conf
+
+修改如下内容：
+
+slaveof 192.168.77.211 12002 # slaveof master的ip master的端口
+
+
+6.2 主从测试
+
+在master set
+
+redis 192.168.77.211:12002> set testms gogogo
+
+OK
+
+ 
+
+在slave get
+
+redis 192.168.77.197:12002> get testms
+
+"gogogo" <---- 获取到的value
+
+
+7. 附加：redis配置文件
+
+daemonize yes
+
+pidfile /var/run/redis.pid
+
+port 12002
+
+timeout 0
+
+tcp-keepalive 0
+
+loglevel notice
+
+logfile stdout
+
+databases 16
+
+save 900 1
+
+save 300 10
+
+save 60 10000
+
+stop-writes-on-bgsave-error yes
+
+rdbcompression yes
+
+rdbchecksum yes
+
+dbfilename dump.rdb
+
+dir /www/redis_12002/
+
+slave-serve-stale-data yes
+
+slave-read-only yes
+
+repl-disable-tcp-nodelay no
+
+slave-priority 100
+
+appendonly no
+
+appendfsync everysec
+
+no-appendfsync-on-rewrite no
+
+auto-aof-rewrite-percentage 100
+
+auto-aof-rewrite-min-size 64mb
+
+lua-time-limit 5000
+
+slowlog-log-slower-than 10000
+
+slowlog-max-len 128
+
+hash-max-ziplist-entries 512
+
+hash-max-ziplist-value 64
+
+list-max-ziplist-entries 512
+
+list-max-ziplist-value 64
+
+set-max-intset-entries 512
+
+zset-max-ziplist-entries 128
+
+zset-max-ziplist-value 64
+
+activerehashing yes
+
+client-output-buffer-limit normal 0 0 0
+
+client-output-buffer-limit slave 256mb 64mb 60
+
+client-output-buffer-limit pubsub 32mb 8mb 60
+
+hz 10
+
+
+如上为单机版本redis的配置文件，如果需要改为主从，只需要增加
+
+
+slaveof 192.168.77.211(redis master IP) 12002（redis master 端口）
+
+
+7. 结束语
+
+
+当然，这还只是集群的第一步，大家可以使用keepalive来实现主的故障转移功能。工作中我们最常用的要数redis主从，所以keepalive + redis实现高可用性集群这边不在讲述。
